@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peanuts Trivia — The Sunday Funnies Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2E8CE; --panel:#FCF8EE; --ink:#211C17;
+    --red:#E23A2E; --gold:#F4B82B; --blue:#2D7FC0; --green:#3FA24B;
+    --shadow:6px 6px 0 var(--ink); --shadow-sm:4px 4px 0 var(--ink);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Nunito',system-ui,sans-serif;color:var(--ink);
+    background-color:var(--paper);
+    background-image:radial-gradient(var(--ink) 1.4px,transparent 1.5px),radial-gradient(var(--ink) 1.4px,transparent 1.5px);
+    background-size:18px 18px,18px 18px;background-position:0 0,9px 9px;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:24px 16px;-webkit-font-smoothing:antialiased;
+  }
+  body::before{content:"";position:fixed;inset:0;
+    background:radial-gradient(120% 90% at 50% 0%,rgba(242,232,206,.92),rgba(242,232,206,.74) 55%,rgba(242,232,206,.55) 100%);
+    pointer-events:none;z-index:0;}
+  .stage{position:relative;z-index:1;width:100%;max-width:640px}
+
+  .panel{position:relative;background:var(--panel);border:3px solid var(--ink);
+    border-radius:18px;box-shadow:var(--shadow);padding:38px 30px 34px;overflow:hidden;}
+  .zigzag{display:block;width:100%;height:16px}
+  .zigzag-top{position:absolute;top:0;left:0;right:0}
+  .corner-dots{position:absolute;width:110px;height:110px;opacity:.16;pointer-events:none;
+    background:radial-gradient(var(--ink) 2.1px,transparent 2.3px);background-size:13px 13px;}
+  .corner-dots.br{right:-14px;bottom:-14px}
+  .corner-dots.tl{left:-14px;top:18px}
+
+  .eyebrow{font-weight:800;text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;color:var(--red)}
+  h1{font-family:'Luckiest Guy',cursive;font-weight:400;line-height:.96;letter-spacing:.5px;
+    font-size:clamp(2.7rem,9vw,4.1rem);margin:.28em 0 .12em;color:var(--ink);text-shadow:3px 3px 0 var(--gold);}
+  h1 .pop{color:var(--red);text-shadow:3px 3px 0 var(--ink)}
+  .lede{font-size:1.05rem;font-weight:600;max-width:34ch;margin:0 auto;color:#4a4239}
+
+  .start{text-align:center;padding-top:54px}
+  .facts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 22px}
+  .chip{background:var(--paper);border:2.5px solid var(--ink);border-radius:999px;
+    padding:8px 16px;font-weight:800;font-size:.84rem;box-shadow:var(--shadow-sm);
+    display:inline-flex;align-items:center;gap:7px}
+  .chip b{font-family:'Luckiest Guy',cursive;font-weight:400;font-size:1.05rem}
+  .bestline{font-weight:800;font-size:.95rem;margin:0 0 26px;color:var(--ink)}
+  .bestline span{font-family:'Luckiest Guy',cursive;color:var(--blue);font-size:1.1rem}
+
+  .start-inner{position:relative;z-index:1}
+  .doodles{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .doodle{position:absolute;transform:rotate(var(--rot,0deg));filter:drop-shadow(2px 2px 0 rgba(33,28,23,.14))}
+  .doodle.kite{top:16px;right:18px;width:58px;--rot:10deg;animation:floaty 4.5s ease-in-out infinite}
+  .doodle.ball{bottom:22px;left:20px;width:46px;--rot:-6deg;animation:floaty 5.2s ease-in-out .4s infinite}
+  .doodle.leaf-1{top:132px;left:16px;width:30px;--rot:-20deg;animation:floaty 4.8s ease-in-out .2s infinite}
+  .doodle.leaf-2{bottom:118px;right:22px;width:26px;--rot:22deg;animation:floaty 5.6s ease-in-out .8s infinite}
+  .doodle.spark{width:22px}
+  .doodle.spark-1{top:34px;left:20px;animation:twinkle 2.8s ease-in-out infinite}
+  .doodle.spark-2{bottom:176px;right:70px;animation:twinkle 3.4s ease-in-out .6s infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(var(--rot))}50%{transform:translateY(-8px) rotate(var(--rot))}}
+  @keyframes twinkle{0%,100%{transform:scale(.82) rotate(0deg);opacity:.55}50%{transform:scale(1.1) rotate(22deg);opacity:1}}
+  @media (max-width:600px){.doodles{display:none}}
+
+  .btn{font-family:'Luckiest Guy',cursive;font-weight:400;font-size:1.35rem;letter-spacing:.5px;
+    background:var(--red);color:#fff;border:3px solid var(--ink);border-radius:14px;
+    padding:15px 40px 13px;cursor:pointer;box-shadow:var(--shadow);
+    transition:transform .08s ease,box-shadow .08s ease;-webkit-text-stroke:.4px var(--ink);}
+  .btn:hover{transform:translate(2px,2px);box-shadow:4px 4px 0 var(--ink)}
+  .btn:active{transform:translate(6px,6px);box-shadow:0 0 0 var(--ink)}
+  .btn.gold{background:var(--gold);color:var(--ink);-webkit-text-stroke:0}
+  .btn.blue{background:var(--blue);color:#fff}
+  .btn.outline{background:var(--panel);color:var(--ink);-webkit-text-stroke:0}
+  .btn.sm{font-size:1.02rem;padding:12px 24px 10px}
+  .btn:focus-visible{outline:4px dashed var(--blue);outline-offset:4px}
+
+  .sndtoggle{margin-top:18px;background:none;border:2.5px solid var(--ink);border-radius:999px;
+    font-weight:800;font-size:.82rem;padding:7px 16px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow-sm);}
+  .sndtoggle:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .sndtoggle:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+
+  .qhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 0;flex-wrap:wrap}
+  .counter{font-weight:900;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em}
+  .counter span{color:var(--red)}
+  .hud{display:flex;align-items:center;gap:10px}
+  .score{font-family:'Luckiest Guy',cursive;font-size:1.05rem;background:var(--blue);color:#fff;
+    border:2.5px solid var(--ink);border-radius:999px;padding:5px 14px 3px;box-shadow:var(--shadow-sm);-webkit-text-stroke:.3px var(--ink);}
+  .timer{position:relative;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+    border:2.5px solid var(--ink);box-shadow:var(--shadow-sm);font-family:'Luckiest Guy',cursive;font-size:1.1rem;
+    --p:100;--ringcol:var(--blue);
+    background:conic-gradient(var(--ringcol) calc(var(--p)*1%),#d9cfb5 0);}
+  .timer::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--panel)}
+  .timer span{position:relative;z-index:1}
+  .timer.low{--ringcol:var(--red);animation:pulse .6s ease-in-out infinite}
+  .sndbtn{width:42px;height:42px;border-radius:50%;border:2.5px solid var(--ink);background:var(--paper);
+    cursor:pointer;font-size:1.05rem;box-shadow:var(--shadow-sm);line-height:1}
+  .sndbtn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .sndbtn:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+
+  .track{height:20px;border:2.5px solid var(--ink);border-radius:999px;background:var(--paper);
+    overflow:hidden;margin:14px 0 26px;box-shadow:inset 2px 2px 0 rgba(33,28,23,.08);}
+  .fill{height:100%;width:0%;background:var(--gold);
+    background-image:linear-gradient(135deg,rgba(255,255,255,.45) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.45) 50%,rgba(255,255,255,.45) 75%,transparent 75%);
+    background-size:18px 18px;transition:width .45s cubic-bezier(.34,1.4,.5,1);}
+
+  .balloon{position:relative;background:var(--paper);border:3px solid var(--ink);border-radius:18px;
+    padding:22px;margin-bottom:24px;box-shadow:var(--shadow-sm);}
+  .balloon::after{content:"";position:absolute;left:38px;bottom:-17px;width:26px;height:26px;background:var(--paper);
+    border-right:3px solid var(--ink);border-bottom:3px solid var(--ink);transform:rotate(45deg);border-bottom-right-radius:5px;}
+  .qtext{font-size:1.32rem;font-weight:800;line-height:1.3}
+
+  .answers{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  .ans{text-align:left;font-family:inherit;font-size:1rem;font-weight:800;background:var(--panel);color:var(--ink);
+    border:3px solid var(--ink);border-radius:13px;padding:15px 15px 14px;cursor:pointer;box-shadow:var(--shadow-sm);
+    transition:transform .08s ease,box-shadow .08s ease,background .15s ease;display:flex;align-items:center;gap:11px;}
+  .ans .key{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;
+    display:grid;place-items:center;font-family:'Luckiest Guy',cursive;font-size:.95rem;border:2px solid var(--ink);}
+  .ans:hover:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .ans:active:not(:disabled){transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+  .ans:focus-visible{outline:4px dashed var(--blue);outline-offset:3px}
+  .ans:disabled{cursor:default}
+  .ans.correct{background:var(--green);color:#fff}
+  .ans.correct .key{background:#fff;color:var(--green)}
+  .ans.wrong{background:var(--red);color:#fff;opacity:.92}
+  .ans.wrong .key{background:#fff;color:var(--red)}
+  .ans.dim{opacity:.5}
+
+  .footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:22px;min-height:50px}
+  .verdict{font-family:'Luckiest Guy',cursive;font-size:1.25rem;opacity:0;transform:translateY(6px);transition:.25s}
+  .verdict.show{opacity:1;transform:none}
+  .verdict.yes{color:var(--green)} .verdict.no{color:var(--red)}
+  .verdict .gain{color:var(--blue);margin-left:6px}
+  .next{margin-left:auto}
+
+  .result{text-align:center;padding-top:50px}
+  .bigscore{font-family:'Luckiest Guy',cursive;font-size:clamp(3rem,13vw,5rem);line-height:1;
+    color:var(--red);text-shadow:4px 4px 0 var(--ink);margin:6px 0 2px;}
+  .bigscore small{font-size:.32em;color:var(--ink);text-shadow:none}
+  .correctline{font-weight:800;font-size:1rem;color:#4a4239;margin-bottom:6px}
+  .correctline b{font-family:'Luckiest Guy',cursive;font-weight:400;color:var(--ink);font-size:1.15rem}
+  .rank{display:inline-block;font-family:'Luckiest Guy',cursive;font-size:1.7rem;background:var(--gold);
+    border:3px solid var(--ink);border-radius:14px;padding:9px 22px 6px;box-shadow:var(--shadow);margin:8px 0 4px;transform:rotate(-2deg);}
+  .rmsg{font-weight:700;font-size:1.05rem;color:#4a4239;max-width:32ch;margin:14px auto 10px}
+  .record{font-family:'Luckiest Guy',cursive;font-size:1.25rem;color:var(--green);margin:6px 0;animation:pulse 1s ease-in-out infinite}
+  .bestsmall{font-weight:800;font-size:.9rem;color:#8a8170;margin-bottom:22px}
+  .rbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+  .review{padding-top:46px}
+  .review h2{font-family:'Luckiest Guy',cursive;font-weight:400;font-size:2rem;text-align:center;margin-bottom:4px}
+  .rsub{text-align:center;font-weight:700;color:#4a4239;margin-bottom:18px}
+  .review-list{text-align:left;display:flex;flex-direction:column;gap:13px;margin-bottom:24px;max-height:52vh;overflow-y:auto;padding-right:4px}
+  .ritem{border:2.5px solid var(--ink);border-radius:13px;padding:13px 15px;background:var(--paper);box-shadow:var(--shadow-sm)}
+  .ritem .rq{font-weight:800;margin-bottom:9px;display:flex;gap:8px;line-height:1.3}
+  .ritem .rq .n{font-family:'Luckiest Guy',cursive;color:var(--blue);flex:0 0 auto}
+  .ra{font-weight:700;font-size:.94rem;display:flex;gap:8px;align-items:flex-start;margin-top:3px}
+  .ra .mark{font-weight:900;flex:0 0 auto}
+  .ra.ok{color:var(--green)} .ra.bad{color:var(--red)} .ra.sol{color:var(--ink)}
+  .rcenter{text-align:center}
+
+  .share{padding-top:46px;text-align:center}
+  .share h2{font-family:'Luckiest Guy',cursive;font-weight:400;font-size:2rem;margin-bottom:14px}
+  .cardwrap{display:flex;justify-content:center;margin:0 0 20px}
+  .cardimg{width:100%;max-width:330px;border:3px solid var(--ink);border-radius:16px;box-shadow:var(--shadow);display:block;background:var(--paper)}
+  .share-actions{display:flex;flex-direction:column;gap:11px;max-width:330px;margin:0 auto}
+  .share-actions .btn{width:100%;justify-content:center;text-align:center}
+  .copyhint{font-weight:700;font-size:.82rem;color:#8a8170;margin-top:14px}
+
+  .hidden{display:none}
+  @media (max-width:520px){
+    .panel{padding:30px 20px 26px}
+    .answers{grid-template-columns:1fr}
+    .balloon::after{left:30px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+  @keyframes pop{0%{transform:scale(.94);opacity:0}100%{transform:scale(1);opacity:1}}
+  .anim{animation:pop .4s cubic-bezier(.34,1.5,.5,1) both}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .shake{animation:shake .32s}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- START -->
+  <main class="panel start anim" id="screen-start">
+    <svg class="zigzag zigzag-top" viewBox="0 0 640 16" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,15 32,2 64,15 96,2 128,15 160,2 192,15 224,2 256,15 288,2 320,15 352,2 384,15 416,2 448,15 480,2 512,15 544,2 576,15 608,2 640,15" fill="none" stroke="#E23A2E" stroke-width="6" stroke-linejoin="round"/></svg>
+    <span class="corner-dots tl" aria-hidden="true"></span>
+    <span class="corner-dots br" aria-hidden="true"></span>
+    <div class="doodles" aria-hidden="true">
+      <svg class="doodle kite" viewBox="0 0 80 132"><polygon points="40,6 72,42 40,78 8,42" fill="#E23A2E" stroke="#211C17" stroke-width="4" stroke-linejoin="round"/><line x1="40" y1="6" x2="40" y2="78" stroke="#211C17" stroke-width="3"/><line x1="8" y1="42" x2="72" y2="42" stroke="#211C17" stroke-width="3"/><path d="M40 78 q 11 12 0 25 q -11 13 0 26" fill="none" stroke="#211C17" stroke-width="3" stroke-linecap="round"/><path d="M33 92 l13 6 -13 6 z" fill="#F4B82B" stroke="#211C17" stroke-width="2.5" stroke-linejoin="round"/><path d="M47 116 l-13 6 13 6 z" fill="#2D7FC0" stroke="#211C17" stroke-width="2.5" stroke-linejoin="round"/></svg>
+      <svg class="doodle ball" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="#FCF8EE" stroke="#211C17" stroke-width="4"/><path d="M15 11 q 11 19 0 38" fill="none" stroke="#E23A2E" stroke-width="3"/><path d="M45 11 q -11 19 0 38" fill="none" stroke="#E23A2E" stroke-width="3"/></svg>
+      <svg class="doodle leaf leaf-1" viewBox="0 0 50 50"><path d="M25 4 C 41 15, 44 35, 25 46 C 6 35, 9 15, 25 4 Z" fill="#F4B82B" stroke="#211C17" stroke-width="3.5"/><line x1="25" y1="11" x2="25" y2="42" stroke="#211C17" stroke-width="2.6"/></svg>
+      <svg class="doodle leaf leaf-2" viewBox="0 0 50 50"><path d="M25 4 C 41 15, 44 35, 25 46 C 6 35, 9 15, 25 4 Z" fill="#E8893A" stroke="#211C17" stroke-width="3.5"/><line x1="25" y1="11" x2="25" y2="42" stroke="#211C17" stroke-width="2.6"/></svg>
+      <svg class="doodle spark spark-1" viewBox="0 0 40 40"><path d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" fill="#F4B82B" stroke="#211C17" stroke-width="3" stroke-linejoin="round"/></svg>
+      <svg class="doodle spark spark-2" viewBox="0 0 40 40"><path d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" fill="#2D7FC0" stroke="#211C17" stroke-width="3" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="start-inner">
+    <p class="eyebrow">The Sunday Funnies Quiz</p>
+    <h1>Peanuts<br><span class="pop">Trivia</span></h1>
+    <p class="lede">A fresh dozen questions on Charlie Brown, Snoopy, and the gang. Answer fast for bonus points!</p>
+    <div class="facts">
+      <span class="chip"><b>12</b> questions</span>
+      <span class="chip"><b>15s</b> + speed bonus</span>
+      <span class="chip"><b>200</b> max per Q</span>
+    </div>
+    <p class="bestline hidden" id="bestLine">🏆 Best score: <span id="bestVal">0</span></p>
+    <button class="btn" id="startBtn">Let's Play</button>
+    <br>
+    <button class="sndtoggle" id="sndStart">🔊 Sound on</button>
+    </div>
+  </main>
+
+  <!-- QUIZ -->
+  <main class="panel hidden" id="screen-quiz">
+    <svg class="zigzag zigzag-top" viewBox="0 0 640 16" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,15 32,2 64,15 96,2 128,15 160,2 192,15 224,2 256,15 288,2 320,15 352,2 384,15 416,2 448,15 480,2 512,15 544,2 576,15 608,2 640,15" fill="none" stroke="#E23A2E" stroke-width="6" stroke-linejoin="round"/></svg>
+    <div class="qhead">
+      <p class="counter">Question <span id="qNum">1</span> / <span id="qTot">12</span></p>
+      <div class="hud">
+        <div class="timer" id="timer"><span>15</span></div>
+        <div class="score" id="scorePill">0 pts</div>
+        <button class="sndbtn" id="sndQuiz" aria-label="Toggle sound">🔊</button>
+      </div>
+    </div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="balloon" id="balloon"><p class="qtext" id="qText">…</p></div>
+    <div class="answers" id="answers"></div>
+    <div class="footer">
+      <p class="verdict" id="verdict"></p>
+      <button class="btn gold next hidden" id="nextBtn">Next →</button>
+    </div>
+  </main>
+
+  <!-- RESULT -->
+  <main class="panel result hidden" id="screen-result">
+    <svg class="zigzag zigzag-top" viewBox="0 0 640 16" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,15 32,2 64,15 96,2 128,15 160,2 192,15 224,2 256,15 288,2 320,15 352,2 384,15 416,2 448,15 480,2 512,15 544,2 576,15 608,2 640,15" fill="none" stroke="#E23A2E" stroke-width="6" stroke-linejoin="round"/></svg>
+    <span class="corner-dots br" aria-hidden="true"></span>
+    <p class="eyebrow">Final Score</p>
+    <div class="bigscore"><span id="finalScore">0</span><small> pts</small></div>
+    <p class="correctline"><b id="finalCorrect">0</b> of <b id="finalTot">12</b> correct</p>
+    <div class="rank" id="rank">Good Grief!</div>
+    <p class="rmsg" id="rmsg"></p>
+    <p class="record hidden" id="recordLine">★ New high score! ★</p>
+    <p class="bestsmall" id="bestSmall"></p>
+    <div class="rbtns">
+      <button class="btn gold sm" id="shareBtn">Share Result</button>
+      <button class="btn outline sm" id="reviewBtn">Review</button>
+      <button class="btn sm" id="againBtn">Play Again</button>
+    </div>
+  </main>
+
+  <!-- REVIEW -->
+  <main class="panel review hidden" id="screen-review">
+    <svg class="zigzag zigzag-top" viewBox="0 0 640 16" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,15 32,2 64,15 96,2 128,15 160,2 192,15 224,2 256,15 288,2 320,15 352,2 384,15 416,2 448,15 480,2 512,15 544,2 576,15 608,2 640,15" fill="none" stroke="#E23A2E" stroke-width="6" stroke-linejoin="round"/></svg>
+    <h2>The Answer Key</h2>
+    <p class="rsub" id="reviewSub">Here's how it shook out.</p>
+    <div class="review-list" id="reviewList"></div>
+    <div class="rcenter"><button class="btn gold" id="backBtn">← Back to Score</button></div>
+  </main>
+
+  <!-- SHARE -->
+  <main class="panel share hidden" id="screen-share">
+    <svg class="zigzag zigzag-top" viewBox="0 0 640 16" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,15 32,2 64,15 96,2 128,15 160,2 192,15 224,2 256,15 288,2 320,15 352,2 384,15 416,2 448,15 480,2 512,15 544,2 576,15 608,2 640,15" fill="none" stroke="#E23A2E" stroke-width="6" stroke-linejoin="round"/></svg>
+    <h2>Your Result Card</h2>
+    <div class="cardwrap"><img id="cardImg" class="cardimg" alt="Your Peanuts Trivia result card"></div>
+    <div class="share-actions">
+      <button class="btn blue sm" id="shareNativeBtn" hidden>Share…</button>
+      <button class="btn gold sm" id="downloadBtn">Download Card</button>
+      <button class="btn outline sm" id="copyBtn">Copy Summary</button>
+      <button class="btn sm" id="shareBackBtn">← Back to Score</button>
+    </div>
+    <p class="copyhint">Paste the summary into any chat — it shares as an emoji grid.</p>
+  </main>
+
+</div>
+
+<script>
+const BANK = [
+  {q:"Who created the Peanuts comic strip?", a:["Charles M. Schulz","Walt Kelly","Jim Davis","Bill Watterson"], c:0},
+  {q:"What breed of dog is Snoopy?", a:["Dachshund","Beagle","Basset Hound","Labrador"], c:1},
+  {q:"How much does Lucy charge at her psychiatric advice booth?", a:["1 cent","25 cents","5 cents","10 cents"], c:2},
+  {q:"What is the name of Snoopy's little yellow bird pal?", a:["Woodstock","Tweety","Chirp","Pip"], c:0},
+  {q:"Which composer does Schroeder famously adore?", a:["Mozart","Bach","Chopin","Beethoven"], c:3},
+  {q:"What does Linus always carry for comfort?", a:["A teddy bear","A security blanket","A pillow","A pacifier"], c:1},
+  {q:"On Halloween, Linus waits in the pumpkin patch for whom?", a:["Santa Claus","The Easter Beagle","The Great Pumpkin","The Tooth Fairy"], c:2},
+  {q:"Charlie Brown's younger sister is named…", a:["Sally","Lucy","Violet","Patty"], c:0},
+  {q:"In his daydreams, Snoopy is a WWI flying ace battling which foe?", a:["The Black Knight","The Red Baron","The Blue Max","Baron Zemo"], c:1},
+  {q:"What recurring prank does Lucy pull on Charlie Brown?", a:["Hides his lunch","Deflates his bike","Yanks the football as he kicks","Steals his kite"], c:2},
+  {q:"In which year did the Peanuts strip first run in newspapers?", a:["1937","1950","1965","1972"], c:1},
+  {q:"The 1965 TV special 'A Charlie Brown ___' celebrates which holiday?", a:["Thanksgiving","Easter","Halloween","Christmas"], c:3},
+  {q:"What instrument does Schroeder play?", a:["Toy piano","Violin","Trumpet","Harmonica"], c:0},
+  {q:"Marcie always politely addresses Peppermint Patty as…", a:["“Boss”","“Sir”","“Chief”","“Ma'am”"], c:1},
+  {q:"What is the name of Snoopy's brother who lives out near Needles?", a:["Olaf","Andy","Spike","Marbles"], c:2},
+  {q:"What was creator Charles Schulz's lifelong nickname?", a:["Chip","Sparky","Buddy","Red"], c:1},
+  {q:"Which character is forever trailed by a cloud of dust?", a:["Franklin","Shermy","Pig-Pen","Rerun"], c:2},
+  {q:"Charlie Brown's kite is endlessly devoured by the kite-eating ___.", a:["Tree","Fence","Bush","Roof"], c:0},
+  {q:"Lucy and Linus have a younger brother named…", a:["Rerun","Schroeder","Franklin","Shermy"], c:0},
+  {q:"In the TV specials, the adults' voices are 'spoken' by what instrument?", a:["Clarinet","Trombone","Saxophone","Tuba"], c:1},
+  {q:"After nearly 50 years, the Peanuts strip ended in which year?", a:["1990","1995","2000","2005"], c:2},
+  {q:"Charlie Brown manages a perpetually losing team in which sport?", a:["Football","Baseball","Hockey","Basketball"], c:1},
+  {q:"Snoopy is most often drawn napping where?", a:["In a basket","On top of his doghouse","Under a tree","In Charlie Brown's bed"], c:1},
+];
+
+const ROUND_SIZE = 12;
+const ROUND_TIME = 15;
+const BASE_PTS = 100;
+const SPEED_MAX = 100;
+const KEYS = ["A","B","C","D"];
+const $ = id => document.getElementById(id);
+
+let deck = [], idx = 0, points = 0, correctCount = 0, locked = false, log = [];
+let timeLeft = ROUND_TIME, timerId = null;
+let bestScore = 0, lastRank = "";
+let cardURL = null, cardBlob = null, summaryText = "";
+
+/* colours mirrored for canvas */
+const C = { paper:"#F2E8CE", panel:"#FCF8EE", ink:"#211C17", red:"#E23A2E", gold:"#F4B82B", blue:"#2D7FC0", green:"#3FA24B" };
+
+/* ---------- persistent best score ---------- */
+function loadBest(){ try{ return parseInt(localStorage.getItem("peanutsBest")||"0",10)||0; }catch(e){ return bestScore; } }
+function saveBest(v){ try{ localStorage.setItem("peanutsBest", String(v)); }catch(e){} }
+function updateBestUI(){
+  if(bestScore>0){ $("bestVal").textContent = bestScore + " pts"; $("bestLine").classList.remove("hidden"); }
+  else $("bestLine").classList.add("hidden");
+}
+
+/* ---------- audio ---------- */
+let actx = null, soundOn = true;
+function ensureAudio(){
+  if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(actx && actx.state === "suspended") actx.resume();
+}
+function sfx(type){
+  if(!soundOn || !actx) return;
+  const now = actx.currentTime;
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.connect(g); g.connect(actx.destination);
+  let wave="sine", dur=.12, vol=.18;
+  if(type==="correct"){ wave="sine"; vol=.2; dur=.2; o.frequency.setValueAtTime(660,now); o.frequency.setValueAtTime(880,now+.09); }
+  else if(type==="wrong"){ wave="square"; vol=.16; dur=.24; o.frequency.setValueAtTime(200,now); o.frequency.exponentialRampToValueAtTime(120,now+.22); }
+  else if(type==="click"){ wave="triangle"; vol=.12; dur=.06; o.frequency.setValueAtTime(520,now); }
+  else if(type==="tick"){ wave="sine"; vol=.12; dur=.05; o.frequency.setValueAtTime(880,now); }
+  o.type=wave;
+  g.gain.setValueAtTime(vol,now);
+  g.gain.exponentialRampToValueAtTime(.0001, now+dur);
+  o.start(now); o.stop(now+dur+.03);
+}
+function jingle(notes){
+  if(!soundOn || !actx) return;
+  notes.forEach((f,i)=>{
+    const t = actx.currentTime + i*.13;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type="triangle"; o.frequency.setValueAtTime(f,t);
+    o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.0001,t+.2);
+    o.start(t); o.stop(t+.22);
+  });
+}
+function toggleSound(){ soundOn = !soundOn; if(soundOn) ensureAudio(); updateSoundUI(); }
+function updateSoundUI(){
+  $("sndStart").textContent = soundOn ? "🔊 Sound on" : "🔇 Sound off";
+  $("sndQuiz").textContent = soundOn ? "🔊" : "🔇";
+}
+
+/* ---------- helpers ---------- */
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function show(screen){
+  ["screen-start","screen-quiz","screen-result","screen-review","screen-share"].forEach(s=>$(s).classList.add("hidden"));
+  const el=$(screen); el.classList.remove("hidden");
+  el.classList.remove("anim"); void el.offsetWidth; el.classList.add("anim");
+}
+
+function buildDeck(){
+  return shuffle([...BANK]).slice(0, ROUND_SIZE).map(item=>{
+    const opts = item.a.map((text,i)=>({text, correct:i===item.c}));
+    shuffle(opts);
+    return { q:item.q, opts, correctIdx: opts.findIndex(o=>o.correct) };
+  });
+}
+
+/* ---------- game flow ---------- */
+function startGame(){
+  ensureAudio();
+  deck = buildDeck();
+  idx = 0; points = 0; correctCount = 0; log = [];
+  $("qTot").textContent = deck.length;
+  updateScore();
+  show("screen-quiz");
+  renderQuestion();
+}
+function updateScore(){ $("scorePill").textContent = points + " pts"; }
+
+function renderQuestion(){
+  locked = false;
+  const item = deck[idx];
+  $("qNum").textContent = idx+1;
+  $("qText").textContent = item.q;
+  $("fill").style.width = (idx/deck.length*100)+"%";
+  const v=$("verdict"); v.className="verdict"; v.innerHTML="";
+  $("nextBtn").classList.add("hidden");
+
+  const wrap=$("answers"); wrap.innerHTML="";
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement("button");
+    b.className="ans";
+    b.innerHTML=`<span class="key">${KEYS[i]}</span><span>${opt.text}</span>`;
+    b.addEventListener("click",()=>{ sfx("click"); choose(i); });
+    wrap.appendChild(b);
+  });
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerId);
+  timeLeft = ROUND_TIME;
+  updateTimer();
+  timerId = setInterval(()=>{
+    timeLeft--;
+    updateTimer();
+    if(timeLeft<=3 && timeLeft>0) sfx("tick");
+    if(timeLeft<=0){ clearInterval(timerId); lockIn(-1); }
+  },1000);
+}
+function updateTimer(){
+  const t=$("timer");
+  t.querySelector("span").textContent=Math.max(timeLeft,0);
+  t.style.setProperty("--p", Math.max(timeLeft,0)/ROUND_TIME*100);
+  t.classList.toggle("low", timeLeft<=5);
+}
+
+function choose(i){ if(!locked) lockIn(i); }
+
+function lockIn(chosen){
+  if(locked) return;
+  locked = true;
+  clearInterval(timerId);
+  const correct = deck[idx].correctIdx;
+  const buttons = [...$("answers").children];
+  buttons.forEach((b,bi)=>{
+    b.disabled=true;
+    if(bi===correct) b.classList.add("correct");
+    else if(bi===chosen) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  log.push({ q:deck[idx].q, opts:deck[idx].opts, chosen, correct });
+
+  const v=$("verdict");
+  if(chosen===correct){
+    const bonus = Math.round(Math.max(timeLeft,0)/ROUND_TIME * SPEED_MAX);
+    const gained = BASE_PTS + bonus;
+    points += gained; correctCount++; updateScore(); sfx("correct");
+    v.innerHTML = pick(["Nice!","Bang!","You got it!","Sweet!","Aaugh-some!"]) + `<span class="gain">+${gained}</span>`;
+    v.classList.add("verdict","yes","show");
+  } else {
+    sfx("wrong");
+    v.textContent = chosen===-1 ? "Time's up!" : pick(["Good grief!","Aaugh!","Oof!","Rats!","So close!"]);
+    v.classList.add("verdict","no","show");
+    $("balloon").classList.add("shake");
+    setTimeout(()=>$("balloon").classList.remove("shake"),340);
+  }
+
+  $("fill").style.width = ((idx+1)/deck.length*100)+"%";
+  const next=$("nextBtn");
+  next.textContent = idx===deck.length-1 ? "See Score →" : "Next →";
+  next.classList.remove("hidden");
+}
+
+function nextQuestion(){
+  sfx("click");
+  idx++;
+  if(idx>=deck.length) showResult();
+  else renderQuestion();
+}
+
+function showResult(){
+  clearInterval(timerId);
+  show("screen-result");
+  $("finalScore").textContent = points;
+  $("finalCorrect").textContent = correctCount;
+  $("finalTot").textContent = deck.length;
+
+  const pct = correctCount/deck.length;
+  let rank,msg;
+  if(pct===1){ rank="Round-Headed Champ!"; msg="A perfect run. Even Lucy couldn't pull this one out from under you."; jingle([523,659,784,1046]); }
+  else if(pct>=.75){ rank="Top of the Doghouse"; msg="Ace work — Snoopy's flying high, and so are you."; jingle([523,659,784]); }
+  else if(pct>=.5){ rank="Pretty Good, Charlie Brown"; msg="Solid showing. A little more time in the pumpkin patch and you'll have it."; }
+  else if(pct>=.25){ rank="Block-Headed Effort"; msg="Hey, you took a swing at the football. That counts for something."; }
+  else { rank="Good Grief!"; msg="Rats. Dust off the blanket and give it another go."; }
+  lastRank = rank;
+  $("rank").textContent=rank;
+  $("rmsg").textContent=msg;
+
+  const isRecord = points > bestScore && points > 0;
+  if(points > bestScore){ bestScore = points; saveBest(bestScore); }
+  $("recordLine").classList.toggle("hidden", !isRecord);
+  $("bestSmall").textContent = "Your best: " + bestScore + " pts";
+  if(isRecord) jingle([659,784,988,1319]);
+  updateBestUI();
+}
+
+function showReview(){
+  sfx("click");
+  show("screen-review");
+  $("reviewSub").textContent = `${correctCount} of ${deck.length} correct · ${points} pts`;
+  const list=$("reviewList"); list.innerHTML="";
+  log.forEach((item,i)=>{
+    const right = item.opts[item.correct].text;
+    const gotRight = item.chosen===item.correct;
+    const yourText = item.chosen===-1 ? "Skipped (ran out of time)" : item.opts[item.chosen].text;
+    const div=document.createElement("div");
+    div.className="ritem";
+    let html = `<div class="rq"><span class="n">${i+1}.</span><span>${item.q}</span></div>`;
+    html += `<div class="ra ${gotRight?'ok':'bad'}"><span class="mark">${gotRight?'✓':'✗'}</span><span>Your answer: ${yourText}</span></div>`;
+    if(!gotRight) html += `<div class="ra sol"><span class="mark">★</span><span>Correct: ${right}</span></div>`;
+    div.innerHTML=html;
+    list.appendChild(div);
+  });
+}
+
+/* ---------- shareable result card ---------- */
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+function buildSummary(){
+  const cells = log.map(it=> it.chosen===it.correct ? "🟩" : "🟥");
+  let rows=[]; for(let i=0;i<cells.length;i+=6) rows.push(cells.slice(i,i+6).join(""));
+  return `🥜 Peanuts Trivia\n🏅 ${lastRank}\n⭐ ${points} pts · ${correctCount}/${deck.length}\n${rows.join("\n")}\nThink you can beat me?`;
+}
+
+async function renderCard(){
+  const S = 1080;
+  const cv = document.createElement("canvas");
+  cv.width = S; cv.height = S;
+  const ctx = cv.getContext("2d");
+  try{ await Promise.all([ document.fonts.load('400 90px "Luckiest Guy"'), document.fonts.load('800 34px "Nunito"'), document.fonts.load('900 30px "Nunito"') ]); }catch(e){}
+
+  // paper
+  ctx.fillStyle = C.paper; ctx.fillRect(0,0,S,S);
+
+  // panel with hard shadow
+  const m=64, pw=S-m*2, ph=S-m*2, r=46;
+  ctx.fillStyle = C.ink; roundRect(ctx, m+14, m+14, pw, ph, r); ctx.fill();
+  ctx.fillStyle = C.panel; roundRect(ctx, m, m, pw, ph, r); ctx.fill();
+  ctx.lineWidth = 8; ctx.strokeStyle = C.ink; ctx.stroke();
+
+  // subtle halftone inside panel
+  ctx.save(); roundRect(ctx, m, m, pw, ph, r); ctx.clip();
+  ctx.fillStyle = C.ink; ctx.globalAlpha = .05;
+  for(let y=m+30;y<m+ph;y+=38) for(let x=m+30;x<m+pw;x+=38){ ctx.beginPath(); ctx.arc(x,y,3.2,0,7); ctx.fill(); }
+  ctx.globalAlpha = 1; ctx.restore();
+
+  ctx.textAlign = "center";
+
+  // zigzag
+  const zx0=m+70, zx1=S-m-70, zy=m+90, n=14, step=(zx1-zx0)/n;
+  ctx.strokeStyle = C.red; ctx.lineWidth = 13; ctx.lineJoin="round";
+  ctx.beginPath();
+  for(let i=0;i<=n;i++){ const x=zx0+i*step, y=zy+(i%2?-14:14); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }
+  ctx.stroke();
+
+  // eyebrow
+  ctx.fillStyle = C.red; ctx.font = '800 26px "Nunito"';
+  try{ ctx.letterSpacing = "5px"; }catch(e){}
+  ctx.fillText("THE SUNDAY FUNNIES QUIZ", S/2, m+170);
+  try{ ctx.letterSpacing = "0px"; }catch(e){}
+
+  // title
+  ctx.font = '400 96px "Luckiest Guy"';
+  ctx.fillStyle = C.gold; ctx.fillText("PEANUTS", S/2+5, m+275);
+  ctx.fillStyle = C.ink;  ctx.fillText("PEANUTS", S/2, m+270);
+  ctx.fillStyle = C.ink;  ctx.fillText("TRIVIA", S/2+5, m+370);
+  ctx.fillStyle = C.red;  ctx.fillText("TRIVIA", S/2, m+365);
+
+  // points label + big number
+  ctx.fillStyle = C.red; ctx.font = '800 26px "Nunito"';
+  try{ ctx.letterSpacing = "6px"; }catch(e){}
+  ctx.fillText("POINTS", S/2, m+430);
+  try{ ctx.letterSpacing = "0px"; }catch(e){}
+
+  ctx.font = '400 132px "Luckiest Guy"';
+  ctx.fillStyle = C.ink; ctx.fillText(String(points), S/2+5, m+545);
+  ctx.fillStyle = C.red; ctx.fillText(String(points), S/2, m+540);
+
+  ctx.fillStyle = C.ink; ctx.font = '900 36px "Nunito"';
+  ctx.fillText(`${correctCount} of ${deck.length} correct`, S/2, m+600);
+
+  // rank pill (rotated)
+  ctx.save();
+  ctx.translate(S/2, m+680);
+  ctx.rotate(-3*Math.PI/180);
+  let rfont = lastRank.length>18 ? 34 : (lastRank.length>12 ? 42 : 48);
+  ctx.font = `400 ${rfont}px "Luckiest Guy"`;
+  const tw = ctx.measureText(lastRank).width;
+  const rpw = Math.min(tw+70, pw-60), rph = rfont+38;
+  ctx.fillStyle = C.ink; roundRect(ctx, -rpw/2+7, -rph/2+7, rpw, rph, 18); ctx.fill();
+  ctx.fillStyle = C.gold; roundRect(ctx, -rpw/2, -rph/2, rpw, rph, 18); ctx.fill();
+  ctx.lineWidth = 6; ctx.strokeStyle = C.ink; ctx.stroke();
+  ctx.fillStyle = C.ink; ctx.textBaseline = "middle";
+  ctx.fillText(lastRank, 0, 4);
+  ctx.restore();
+  ctx.textBaseline = "alphabetic";
+
+  // result grid (2 rows x 6)
+  const cols=6, cell=66, gap=18, gw=cols*cell+(cols-1)*gap;
+  const gx0 = S/2-gw/2, gy0 = m+740;
+  log.forEach((it,i)=>{
+    const rr=Math.floor(i/cols), cc=i%cols;
+    const x=gx0+cc*(cell+gap), y=gy0+rr*(cell+gap);
+    ctx.fillStyle = (it.chosen===it.correct) ? C.green : C.red;
+    roundRect(ctx, x, y, cell, cell, 14); ctx.fill();
+    ctx.lineWidth=4; ctx.strokeStyle=C.ink; ctx.stroke();
+  });
+
+  // footer
+  ctx.fillStyle = C.ink; ctx.font = '800 30px "Nunito"';
+  const foot = bestScore>0 ? `🥜  Best: ${bestScore} pts  ·  Can you beat me?` : "🥜  Can you beat me?";
+  ctx.fillText(foot, S/2, m+ph-46);
+
+  const url = cv.toDataURL("image/png");
+  const blob = await new Promise(res=> cv.toBlob(res, "image/png"));
+  return { url, blob };
+}
+
+async function showShare(){
+  sfx("click");
+  show("screen-share");
+  $("cardImg").removeAttribute("src");
+  summaryText = buildSummary();
+  try{
+    const { url, blob } = await renderCard();
+    cardURL = url; cardBlob = blob;
+    $("cardImg").src = url;
+  }catch(e){
+    cardURL = null; cardBlob = null;
+    $("cardImg").alt = "Could not render the card, but you can still copy the summary.";
+  }
+}
+
+function flash(btn, msg){
+  const old = btn.textContent;
+  btn.textContent = msg;
+  setTimeout(()=>{ btn.textContent = old; }, 1600);
+}
+
+function copySummary(){
+  sfx("click");
+  const text = summaryText || buildSummary();
+  const done = ()=>flash($("copyBtn"), "Copied! ✓");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>legacyCopy(text,done));
+  } else legacyCopy(text, done);
+}
+function legacyCopy(text, done){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){ flash($("copyBtn"),"Copy failed"); }
+  document.body.removeChild(ta);
+}
+
+function downloadCard(){
+  sfx("click");
+  if(!cardURL){ flash($("downloadBtn"),"Card not ready"); return; }
+  const a=document.createElement("a");
+  a.href=cardURL; a.download="peanuts-trivia-result.png";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  flash($("downloadBtn"),"Saved! ✓");
+}
+
+async function nativeShare(){
+  sfx("click");
+  const text = summaryText || buildSummary();
+  try{
+    if(cardBlob && navigator.canShare){
+      const file = new File([cardBlob], "peanuts-trivia-result.png", { type:"image/png" });
+      if(navigator.canShare({ files:[file] })){
+        await navigator.share({ files:[file], text, title:"Peanuts Trivia" });
+        return;
+      }
+    }
+    await navigator.share({ text, title:"Peanuts Trivia" });
+  }catch(e){ /* user cancelled or unsupported */ }
+}
+
+/* ---------- wiring ---------- */
+$("startBtn").addEventListener("click", startGame);
+$("nextBtn").addEventListener("click", nextQuestion);
+$("againBtn").addEventListener("click", startGame);
+$("reviewBtn").addEventListener("click", showReview);
+$("backBtn").addEventListener("click", ()=>{ sfx("click"); show("screen-result"); });
+$("shareBtn").addEventListener("click", showShare);
+$("shareBackBtn").addEventListener("click", ()=>{ sfx("click"); show("screen-result"); });
+$("downloadBtn").addEventListener("click", downloadCard);
+$("copyBtn").addEventListener("click", copySummary);
+$("shareNativeBtn").addEventListener("click", nativeShare);
+$("sndStart").addEventListener("click", toggleSound);
+$("sndQuiz").addEventListener("click", toggleSound);
+
+document.addEventListener("keydown", e=>{
+  if(!$("screen-quiz").classList.contains("hidden")){
+    const map={"1":0,"2":1,"3":2,"4":3,"a":0,"b":1,"c":2,"d":3};
+    const k=e.key.toLowerCase();
+    if(k in map && !locked){ const b=$("answers").children[map[k]]; if(b) b.click(); }
+    else if(e.key==="Enter" && !$("nextBtn").classList.contains("hidden")){ $("nextBtn").click(); }
+  }
+});
+
+if(navigator.share) $("shareNativeBtn").hidden = false;
+bestScore = loadBest();
+updateBestUI();
+updateSoundUI();
+</script>
+</body>
+</html>
